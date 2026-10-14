@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,13 +43,19 @@ fun CryptoDetailScreen(
     symbol: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CryptoDetailViewModel = viewModel { CryptoDetailViewModel(symbol, AppContainer.cryptoRepository) },
+    viewModel: CryptoDetailViewModel = viewModel { CryptoDetailViewModel(symbol, AppContainer.cryptoRepository,
+        AppContainer.favoritesRepository) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle(
+        initialValue = false
+    )
 
     CryptoDetailContent(
         symbol = symbol,
         uiState = uiState,
+        isFavorite = isFavorite,
+        onFavoriteClick = viewModel::toggleFavorite,
         onBack = onBack,
         onRetry = viewModel::retry,
         modifier = modifier,
@@ -58,6 +66,8 @@ fun CryptoDetailScreen(
 fun CryptoDetailContent(
     symbol: String,
     uiState: CryptoDetailUiState,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     onBack: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -70,6 +80,22 @@ fun CryptoDetailContent(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onFavoriteClick) {
+                        Icon(
+                            imageVector = if (isFavorite) {
+                                Icons.Filled.Favorite
+                            } else {
+                                Icons.Filled.FavoriteBorder
+                            },
+                            contentDescription = if (isFavorite) {
+                                "Retirer des favoris"
+                            } else {
+                                "Ajouter aux favoris"
+                            }
+                        )
                     }
                 },
             )
@@ -151,6 +177,8 @@ fun CryptoDetailContentPreview() {
             uiState = CryptoDetailUiState.Success(
                 Crypto(symbol = "BTC", name = "Bitcoin", price = 85613.50, changePercent = 0.88, highPrice = 86000.0,lowPrice = 84000.0,),
             ),
+            isFavorite = false,
+            onFavoriteClick = {},
             onBack = {},
             onRetry = {},
         )

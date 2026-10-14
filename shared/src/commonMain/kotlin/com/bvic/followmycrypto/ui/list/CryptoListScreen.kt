@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -17,10 +20,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,14 +46,19 @@ import com.bvic.followmycrypto.ui.format.formatPrice
 fun CryptoListScreen(
     onCryptoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CryptoListViewModel = viewModel { CryptoListViewModel(AppContainer.cryptoRepository) },
+    viewModel: CryptoListViewModel = viewModel { CryptoListViewModel(AppContainer.cryptoRepository,
+        AppContainer.favoritesRepository) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val showFavoritesOnly by viewModel.showFavoritesOnly.collectAsStateWithLifecycle()
 
     CryptoListContent(
         uiState = uiState,
         onRefresh = viewModel::refresh,
         onCryptoClick = onCryptoClick,
+        onFavoriteClick = viewModel::toggleFavorite,
+        showFavoritesOnly = showFavoritesOnly,
+        onToggleFavoritesFilter = viewModel::toggleFavoritesFilter,
         modifier = modifier,
     )
 }
@@ -58,6 +69,9 @@ fun CryptoListContent(
     uiState: CryptoListUiState,
     onRefresh: () -> Unit,
     onCryptoClick: (String) -> Unit,
+    onFavoriteClick: (String) -> Unit,
+    showFavoritesOnly: Boolean,
+    onToggleFavoritesFilter: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -73,43 +87,80 @@ fun CryptoListContent(
             )
         },
     ) { innerPadding ->
-        val contentModifier = Modifier.padding(innerPadding).fillMaxSize()
-        when (uiState) {
-            CryptoListUiState.Loading -> LoadingContent(modifier = contentModifier)
-            is CryptoListUiState.Error -> ErrorContent(
-                message = uiState.message,
-                onRetry = onRefresh,
-                modifier = contentModifier,
-            )
-            is CryptoListUiState.Success -> CryptoList(
-                cryptos = uiState.cryptos,
-                onCryptoClick = onCryptoClick,
-                modifier = contentModifier,
-            )
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            TextButton(
+                onClick = onToggleFavoritesFilter,
+                modifier = Modifier.padding(start = 12.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color.Gray
+                )
+            ) {
+                Text(
+                    text = if (showFavoritesOnly) "Toutes" else "Favoris seulement"
+                )
+            }
+
+            when (uiState) {
+                CryptoListUiState.Loading -> LoadingContent(
+                    modifier = Modifier.weight(1f)
+                )
+
+                is CryptoListUiState.Error -> ErrorContent(
+                    message = uiState.message,
+                    onRetry = onRefresh,
+                    modifier = Modifier.weight(1f)
+                )
+
+                is CryptoListUiState.Success -> CryptoList(
+                    cryptos = uiState.cryptos,
+                    favoriteSymbols = uiState.favoriteSymbols,
+                    onCryptoClick = onCryptoClick,
+                    onFavoriteClick = onFavoriteClick,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
-}
+
+    }
 
 @Composable
 fun CryptoList(
     cryptos: List<Crypto>,
+    favoriteSymbols: Set<String>,
     onCryptoClick: (String) -> Unit,
+    onFavoriteClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = cryptos, key = { it.symbol }) { crypto ->
-            CryptoRow(crypto = crypto, onClick = { onCryptoClick(crypto.symbol) })
+            CryptoRow(
+                crypto = crypto,
+                isFavorite= crypto.symbol in favoriteSymbols,
+                onCryptoClick = { onCryptoClick(crypto.symbol) },
+                onFavoriteClick = { onFavoriteClick(crypto.symbol) }
+            )
             HorizontalDivider()
         }
     }
 }
 
 @Composable
-fun CryptoRow(crypto: Crypto, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun CryptoRow(
+        crypto: Crypto,
+        isFavorite: Boolean,
+        onCryptoClick: () -> Unit,
+        onFavoriteClick: () -> Unit,
+        modifier: Modifier = Modifier)
+    {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = onCryptoClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -136,6 +187,13 @@ fun CryptoRow(crypto: Crypto, onClick: () -> Unit, modifier: Modifier = Modifier
                 color = if (crypto.changePercent >= 0) PriceUp else PriceDown,
             )
         }
+        IconButton(onClick = onFavoriteClick){
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite
+                else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isFavorite) "Selected in favorites" else "Unselected in favorites"
+            )
+        }
     }
 }
 
@@ -148,7 +206,7 @@ private val previewCryptos = listOf(
 @Composable
 fun CryptoRowPreview() {
     FollowMyCryptoTheme {
-        CryptoRow(crypto = previewCryptos.first(), onClick = {})
+        CryptoRow(crypto = previewCryptos.first(), isFavorite = false, onCryptoClick = {}, onFavoriteClick = {})
     }
 }
 
@@ -156,7 +214,8 @@ fun CryptoRowPreview() {
 @Composable
 fun CryptoListContentPreview() {
     FollowMyCryptoTheme {
-        CryptoListContent(uiState = CryptoListUiState.Success(previewCryptos), onRefresh = {}, onCryptoClick = {})
+        CryptoListContent(uiState = CryptoListUiState.Success(previewCryptos, emptySet()), onRefresh = {}, onCryptoClick = {}, onFavoriteClick = {}, showFavoritesOnly = false,
+            onToggleFavoritesFilter = {})
     }
 }
 
@@ -164,6 +223,7 @@ fun CryptoListContentPreview() {
 @Composable
 fun CryptoListErrorPreview() {
     FollowMyCryptoTheme {
-        CryptoListContent(uiState = CryptoListUiState.Error("Impossible de charger les cours."), onRefresh = {}, onCryptoClick = {})
+        CryptoListContent(uiState = CryptoListUiState.Error("Impossible de charger les cours."), onRefresh = {}, onCryptoClick = {}, onFavoriteClick = {}, showFavoritesOnly = false,
+            onToggleFavoritesFilter = {})
     }
 }
