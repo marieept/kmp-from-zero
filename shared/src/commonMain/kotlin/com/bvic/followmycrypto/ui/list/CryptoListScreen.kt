@@ -1,5 +1,6 @@
 package com.bvic.followmycrypto.ui.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +21,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+<<<<<<< HEAD
 import androidx.compose.material3.TextButton
+=======
+import androidx.compose.material3.lightColorScheme
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,6 +46,7 @@ import com.bvic.followmycrypto.ui.components.ErrorContent
 import com.bvic.followmycrypto.ui.components.LoadingContent
 import com.bvic.followmycrypto.ui.format.formatPercent
 import com.bvic.followmycrypto.ui.format.formatPrice
+import androidx.compose.material3.TopAppBarDefaults
 
 @Composable
 fun CryptoListScreen(
@@ -60,6 +66,7 @@ fun CryptoListScreen(
         showFavoritesOnly = showFavoritesOnly,
         onToggleFavoritesFilter = viewModel::toggleFavoritesFilter,
         modifier = modifier,
+
     )
 }
 
@@ -76,12 +83,21 @@ fun CryptoListContent(
 ) {
     Scaffold(
         modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("FollowMyCrypto", fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
                 actions = {
                     IconButton(onClick = onRefresh) {
                         Icon(Icons.Filled.Refresh, contentDescription = "Rafraîchir")
+
                     }
                 },
             )
@@ -138,6 +154,7 @@ fun CryptoList(
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = cryptos, key = { it.symbol }) { crypto ->
+<<<<<<< HEAD
             CryptoRow(
                 crypto = crypto,
                 isFavorite= crypto.symbol in favoriteSymbols,
@@ -145,6 +162,13 @@ fun CryptoList(
                 onFavoriteClick = { onFavoriteClick(crypto.symbol) }
             )
             HorizontalDivider()
+=======
+            CryptoRow(crypto = crypto, onClick = { onCryptoClick(crypto.symbol) })
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
         }
     }
 }
@@ -160,30 +184,38 @@ fun CryptoRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
+<<<<<<< HEAD
             .clickable(onClick = onCryptoClick)
+=======
+            .clickable(onClick = onClick)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
+
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = crypto.name,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
                 text = crypto.symbol,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
             )
         }
         Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = formatPrice(crypto.price),
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
                 text = formatPercent(crypto.changePercent),
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = if (crypto.changePercent >= 0) PriceUp else PriceDown,
             )
         }

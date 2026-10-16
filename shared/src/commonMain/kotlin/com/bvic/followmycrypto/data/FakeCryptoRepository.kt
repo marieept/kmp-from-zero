@@ -22,6 +22,11 @@ class FakeCryptoRepository : CryptoRepository {
         return mockCryptos
     }
 
+    override suspend fun getPriceHistory(symbol: String): List<Double> {
+        delay(1_000)
+        return listOf(100.0, 104.0, 101.0, 108.0, 106.0, 112.0, 109.0, 115.0)
+    }
+
     override suspend fun getCrypto(symbol: String): Crypto {
         delay(500)
         return mockCryptos.first { it.symbol == symbol }

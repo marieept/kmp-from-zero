@@ -1,11 +1,18 @@
 package com.bvic.followmycrypto.ui.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+<<<<<<< HEAD
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+=======
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -13,11 +20,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,15 +56,23 @@ fun CryptoDetailScreen(
         AppContainer.favoritesRepository) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+<<<<<<< HEAD
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle(
         initialValue = false
     )
+=======
+    val chartState by viewModel.chartState.collectAsStateWithLifecycle()
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
 
     CryptoDetailContent(
         symbol = symbol,
         uiState = uiState,
+<<<<<<< HEAD
         isFavorite = isFavorite,
         onFavoriteClick = viewModel::toggleFavorite,
+=======
+        chartState = chartState,
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
         onBack = onBack,
         onRetry = viewModel::retry,
         modifier = modifier,
@@ -66,17 +83,28 @@ fun CryptoDetailScreen(
 fun CryptoDetailContent(
     symbol: String,
     uiState: CryptoDetailUiState,
+<<<<<<< HEAD
     isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
+=======
+    chartState: ChartUiState,
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
     onBack: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier,
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(symbol, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
@@ -109,26 +137,36 @@ fun CryptoDetailContent(
                 onRetry = onRetry,
                 modifier = contentModifier,
             )
-            is CryptoDetailUiState.Success -> CryptoDetail(crypto = uiState.crypto, modifier = contentModifier)
+            is CryptoDetailUiState.Success -> CryptoDetail(
+                crypto = uiState.crypto,
+                chartState = chartState,
+                modifier = contentModifier,
+            )
         }
     }
 }
 
 @Composable
-fun CryptoDetail(crypto: Crypto, modifier: Modifier = Modifier) {
+fun CryptoDetail(
+    crypto: Crypto,
+    chartState: ChartUiState,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = modifier.padding(24.dp),
+        modifier = modifier.padding(24.dp)
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = crypto.name,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
         )
         Text(
             text = formatPrice(crypto.price),
-            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
         )
         Text(
@@ -137,6 +175,7 @@ fun CryptoDetail(crypto: Crypto, modifier: Modifier = Modifier) {
             color = if (crypto.changePercent >= 0) PriceUp else PriceDown,
         )
 
+<<<<<<< HEAD
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -163,6 +202,19 @@ fun CryptoDetail(crypto: Crypto, modifier: Modifier = Modifier) {
             Text(
                 text = formatPrice(crypto.lowPrice),
                 fontWeight = FontWeight.Bold,
+=======
+        Spacer(modifier = Modifier.height(16.dp))
+
+        when (chartState) {
+            ChartUiState.Loading -> CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+            )
+            is ChartUiState.Success -> PriceChart(prices = chartState.prices)
+            ChartUiState.Error -> Text(
+                text = "Graphique indisponible",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
             )
         }
     }
@@ -177,8 +229,12 @@ fun CryptoDetailContentPreview() {
             uiState = CryptoDetailUiState.Success(
                 Crypto(symbol = "BTC", name = "Bitcoin", price = 85613.50, changePercent = 0.88, highPrice = 86000.0,lowPrice = 84000.0,),
             ),
+<<<<<<< HEAD
             isFavorite = false,
             onFavoriteClick = {},
+=======
+            chartState = ChartUiState.Success(listOf(100.0, 104.0, 101.0, 108.0, 106.0, 112.0)),
+>>>>>>> fd2bee6 (Commit 6 and 17 evo +)
             onBack = {},
             onRetry = {},
         )

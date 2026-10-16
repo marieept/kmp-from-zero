@@ -6,5 +6,10 @@ import com.bvic.followmycrypto.model.Crypto
 interface CryptoRepository {
     suspend fun getCryptos(): List<Crypto>
 
+    suspend fun getPriceHistory(symbol: String): List<Double>
+
+
+
+
     suspend fun getCrypto(symbol: String): Crypto
 }

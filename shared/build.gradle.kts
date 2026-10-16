@@ -47,6 +47,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
+            implementation("androidx.compose.ui:ui-text-google-fonts:1.8.2")
         }
         jvmMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -69,6 +70,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinxJson)
             implementation(libs.kotlinx.serializationJson)
             implementation(libs.navigation.compose)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

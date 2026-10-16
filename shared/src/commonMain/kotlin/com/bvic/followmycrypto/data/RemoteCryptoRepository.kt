@@ -27,6 +27,9 @@ class RemoteCryptoRepository(private val api: BinanceApi) : CryptoRepository {
         return tickers.map { ticker -> ticker.toCrypto() }
     }
 
+    override suspend fun getPriceHistory(symbol: String): List<Double> =
+        api.getPriceHistory(pair = symbol + "USDT")
+
     override suspend fun getCrypto(symbol: String): Crypto {
         val tickers = api.getTickers(listOf(symbol + "USDT"))
         return tickers.first().toCrypto()
