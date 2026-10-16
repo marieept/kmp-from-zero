@@ -21,11 +21,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-<<<<<<< HEAD
 import androidx.compose.material3.TextButton
-=======
 import androidx.compose.material3.lightColorScheme
->>>>>>> fd2bee6 (Commit 6 and 17 evo +)
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -154,21 +151,16 @@ fun CryptoList(
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(items = cryptos, key = { it.symbol }) { crypto ->
-<<<<<<< HEAD
             CryptoRow(
                 crypto = crypto,
                 isFavorite= crypto.symbol in favoriteSymbols,
                 onCryptoClick = { onCryptoClick(crypto.symbol) },
                 onFavoriteClick = { onFavoriteClick(crypto.symbol) }
             )
-            HorizontalDivider()
-=======
-            CryptoRow(crypto = crypto, onClick = { onCryptoClick(crypto.symbol) })
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
->>>>>>> fd2bee6 (Commit 6 and 17 evo +)
         }
     }
 }
@@ -184,12 +176,8 @@ fun CryptoRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-<<<<<<< HEAD
             .clickable(onClick = onCryptoClick)
-=======
-            .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.surfaceContainer)
->>>>>>> fd2bee6 (Commit 6 and 17 evo +)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
 

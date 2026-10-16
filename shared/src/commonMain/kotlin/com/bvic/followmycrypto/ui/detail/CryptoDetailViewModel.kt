@@ -26,13 +26,10 @@ class CryptoDetailViewModel(
     private val _uiState = MutableStateFlow<CryptoDetailUiState>(CryptoDetailUiState.Loading)
     val uiState: StateFlow<CryptoDetailUiState> = _uiState.asStateFlow()
 
-<<<<<<< HEAD
     val isFavorite = favoritesRepository.favorites
         .map { favorites -> symbol in favorites }
-=======
     private val _chartState = MutableStateFlow<ChartUiState>(ChartUiState.Loading)
     val chartState: StateFlow<ChartUiState> = _chartState.asStateFlow()
->>>>>>> fd2bee6 (Commit 6 and 17 evo +)
 
     init {
         load()
@@ -55,12 +52,10 @@ class CryptoDetailViewModel(
         }
     }
 
-<<<<<<< HEAD
     fun toggleFavorite() {
         favoritesRepository.toggleFavorite(symbol)
     }
-}
-=======
+
     private fun loadChart() {
         _chartState.value = ChartUiState.Loading
         viewModelScope.launch {
@@ -73,4 +68,3 @@ class CryptoDetailViewModel(
         }
     }
 }
->>>>>>> fd2bee6 (Commit 6 and 17 evo +)
